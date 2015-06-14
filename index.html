@@ -1,0 +1,77 @@
+<!DOCTYPE html> 
+<html>
+<head>
+<meta charset="utf-8">
+<title>phonegap_device_network_notification01</title>
+<link href="../jquery.mobile-1.3.2.css" rel="stylesheet" type="text/css"/>
+<script src="../jquery.js" type="text/javascript"></script>
+<script src="../jquery.mobile-1.3.2.js" type="text/javascript"></script>
+<script src="../cordova.js" type="text/javascript"></script>
+<script type="text/javascript" charset="utf-8">
+    var watchID = null;
+    document.addEventListener("deviceready", onDeviceReady, false); //deviceready
+	var oldValue = {
+		x: null,
+		y: null,
+		z: null
+	}
+    function onDeviceReady() {
+        startWatch();
+    }
+    function startWatch() {
+        var options = { frequency: 300 };
+
+        watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+    }
+    function stopWatch() {
+        if (watchID) {
+            navigator.accelerometer.clearWatch(watchID);
+            watchID = null;
+        }
+    }
+    // 获取加速度信息成功后的回调函数 
+    function onSuccess(newValue) {
+	    var changes = {};
+	    var count = 2;
+		if (oldValue.x !== null) {
+			changes.x = Math.abs(oldValue.x-newValue.x);
+			changes.y = Math.abs(oldValue.y-newValue.y);
+			changes.z = Math.abs(oldValue.z-newValue.z);
+		}
+		if ((changes.x > count && changes.y > count) || (changes.x > count && changes.z >count)|| (changes.y > count && changes.z >count)) {
+			alert('检测到手机晃动');
+		}
+		oldValue = {
+		x: newValue.x,
+		y: newValue.y,
+		z: newValue.z
+		}
+        var element = document.getElementById('accelerometer');
+        element.innerHTML = 'Acceleration X: ' + newValue.x + '<br />' +
+                            'Acceleration Y: ' + newValue.y + '<br />' +
+                            'Acceleration Z: ' + newValue.z + '<br />' + 
+                            'Timestamp: '      + newValue.timestamp + '<br />';
+    }
+    // 获取加速度信息失败后的回调函数
+    function onError() {
+        alert('onError!');
+    }
+
+    </script>
+</head> 
+<body>
+<div data-role="page">
+		<div data-role="header">
+			<h1>PhoneGap100实战</h1>
+		</div>
+		<div data-role="content">
+		 <div id="accelerometer">监测加速度信息中...</div>
+   		 <button onclick="stopWatch();">停止监测加速度信息</button>		
+		</div>		
+		<div data-role="footer">
+			<h4>&nbsp;</h4>
+		</div>
+</div>
+
+</body>
+</html>
